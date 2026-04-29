@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import Usuarios from "./pages/Usuarios";
 
 const TABS = [
   { id: "inicio",   label: "Inicio",   icon: "⌂" },
@@ -16,9 +17,15 @@ function Placeholder({ label }) {
   );
 }
 
+function renderPage(id) {
+  switch (id) {
+    case "usuarios": return <Usuarios />;
+    default:         return <Placeholder label={TABS.find(t => t.id === id)?.label} />;
+  }
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState("inicio");
-  const current = TABS.find((t) => t.id === activeTab);
 
   return (
     <div className="admin-shell">
@@ -42,7 +49,7 @@ export default function App() {
       </header>
 
       <main className="content-area">
-        <Placeholder label={current.label} />
+        {renderPage(activeTab)}
       </main>
     </div>
   );
