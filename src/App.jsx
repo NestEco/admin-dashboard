@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import Usuarios from "./pages/Usuarios";
+import Comics   from "./pages/Comics";
 
 const TABS = [
   { id: "inicio",   label: "Inicio",   icon: "⌂" },
@@ -20,6 +21,7 @@ function Placeholder({ label }) {
 function renderPage(id) {
   switch (id) {
     case "usuarios": return <Usuarios />;
+    case "comics":   return <Comics />;
     default:         return <Placeholder label={TABS.find(t => t.id === id)?.label} />;
   }
 }
