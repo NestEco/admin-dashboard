@@ -1,0 +1,261 @@
+/* src/pages/Comics.css */
+
+.comics-page {
+  padding: 2rem 2.5rem;
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* ── Header ── */
+.comics-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.comics-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-main, #f8fafc);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.comics-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.comics-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-refresh-comics {
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-refresh-comics:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main, #f8fafc);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Stats Row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(129, 140, 248, 0.2);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-main, #f8fafc);
+  letter-spacing: -0.02em;
+}
+
+/* ── Table ── */
+.comics-table-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.comics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.comics-table thead th {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.75rem 1.25rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #94a3b8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.comics-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease;
+}
+
+.comics-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.comics-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.comics-table td {
+  padding: 1rem 1.25rem;
+  color: var(--text-main, #f8fafc);
+  vertical-align: middle;
+}
+
+/* ── Comic cell ── */
+.comic-title-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comic-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  background: rgba(129, 140, 248, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.comic-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-main, #f8fafc);
+}
+
+.comic-author {
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+  margin: 2px 0 0;
+}
+
+/* ── Editorial badge ── */
+.editorial-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  background: rgba(129, 140, 248, 0.1);
+  color: #a5b4fc;
+  border: 1px solid rgba(129, 140, 248, 0.15);
+}
+
+/* ── Price ── */
+.price-cell {
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  color: #e0e7ff;
+}
+
+/* ── Stock badge ── */
+.stock-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+}
+
+.stock-badge.stock-high {
+  background: rgba(16, 185, 129, 0.1);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.stock-badge.stock-mid {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fcd34d;
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.stock-badge.stock-low {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+/* ── States ── */
+.comics-state-msg {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.875rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.comics-empty-row {
+  text-align: center;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.8rem;
+  padding: 2rem !important;
+}
+
+.comics-error-box {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.comics-error-box strong {
+  color: #fca5a5;
+  font-size: 0.875rem;
+}
+
+.comics-error-box p {
+  color: #f87171;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.comics-error-box .comics-error-hint {
+  margin-top: 8px;
+  color: var(--text-muted, #94a3b8);
+}
+
+.comics-error-box code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}

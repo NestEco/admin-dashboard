@@ -1,9 +1,18 @@
 // src/services/usuariosApi.js
 const BASE_URL = import.meta.env.VITE_API_URL;
 
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders(),
     ...options,
   });
 
@@ -17,7 +26,7 @@ async function request(path, options = {}) {
 }
 
 export const usuariosApi = {
-  obtenerTodos:   ()             => request("/"),
+  obtenerTodos:   ()             => request(""),
   obtenerPorId:   (id)           => request(`/${id}`),
   obtenerPorEmail:(email)        => request(`/email/${email}`),
   registrar:      (usuario)      => request("/registro", { method: "POST", body: JSON.stringify(usuario) }),

@@ -1,8 +1,9 @@
-/* src/pages/Usuarios.css */
+/* src/pages/Usuarios.css — Dark theme */
 
 .usuarios-page {
   padding: 2rem 2.5rem;
   max-width: 1000px;
+  width: 100%;
 }
 
 /* ── Header ── */
@@ -10,20 +11,20 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .page-title {
-  font-size: 22px;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #1a1a2e;
-  letter-spacing: -0.4px;
-  margin-bottom: 2px;
+  color: var(--text-main, #f8fafc);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
 }
 
 .page-subtitle {
-  font-size: 13px;
-  color: #888780;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
 }
 
 .header-actions {
@@ -34,38 +35,45 @@
 
 /* ── Status badge ── */
 .status-badge {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
 }
 
 .status-badge.status-UP {
-  background: #eaf3de;
-  color: #3b6d11;
+  background: rgba(16, 185, 129, 0.1);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.15);
 }
 
 .status-badge.status-DOWN,
 .status-badge.status-— {
-  background: #fcebeb;
-  color: #a32d2d;
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
 /* ── Botón actualizar ── */
 .btn-refresh {
   height: 34px;
   padding: 0 16px;
-  border: 0.5px solid rgba(0,0,0,0.18);
-  border-radius: 8px;
-  background: #ffffff;
-  font-family: 'Syne', sans-serif;
-  font-size: 13px;
-  color: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted, #94a3b8);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
 }
 
-.btn-refresh:hover { background: #f5f4f0; }
+.btn-refresh:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main, #f8fafc);
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
 /* ── Buscador ── */
 .search-bar { margin-bottom: 1.25rem; }
@@ -74,58 +82,62 @@
   width: 320px;
   height: 38px;
   padding: 0 14px;
-  border: 0.5px solid rgba(0,0,0,0.18);
-  border-radius: 8px;
-  font-family: 'Syne', sans-serif;
-  font-size: 14px;
-  color: #1a1a2e;
-  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: var(--text-main, #f8fafc);
+  background: rgba(0, 0, 0, 0.2);
   outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input::placeholder {
+  color: #475569;
 }
 
 .search-input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+  border-color: var(--primary-color, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 /* ── Tabla ── */
 .table-wrapper {
-  border: 0.5px solid rgba(0,0,0,0.1);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
   overflow: hidden;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .users-table thead th {
-  background: #f5f4f0;
-  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.75rem 1.25rem;
   text-align: left;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #888780;
-  border-bottom: 0.5px solid rgba(0,0,0,0.1);
+  color: var(--text-muted, #94a3b8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .users-table tbody tr {
-  border-bottom: 0.5px solid rgba(0,0,0,0.07);
-  transition: background 0.12s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease;
 }
 
 .users-table tbody tr:last-child { border-bottom: none; }
-.users-table tbody tr:hover { background: #fafaf8; }
+.users-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
 .users-table td {
-  padding: 12px 16px;
-  color: #1a1a2e;
+  padding: 0.75rem 1.25rem;
+  color: var(--text-main, #f8fafc);
   vertical-align: middle;
 }
 
@@ -140,74 +152,98 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #eeedfe;
-  color: #3c3489;
+  background: rgba(129, 140, 248, 0.15);
+  color: #a5b4fc;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
-.user-name  { font-size: 14px; font-weight: 500; margin: 0; }
-.user-email { font-size: 12px; color: #888780; margin: 0; }
+.user-name  { font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--text-main, #f8fafc); }
+.user-email { font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin: 0; }
 
 /* ── Rol badge ── */
 .rol-badge {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
-  padding: 3px 10px;
-  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
 }
 
-.rol-badge.rol-admin      { background: #e6f1fb; color: #0c447c; }
-.rol-badge.rol-cliente    { background: #f1efe8; color: #5f5e5a; }
-.rol-badge.rol-moderador  { background: #faeeda; color: #633806; }
+.rol-badge.rol-admin {
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.rol-badge.rol-cliente {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted, #94a3b8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rol-badge.rol-moderador {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fcd34d;
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
 
 /* ── Date ── */
-.date-cell { color: #888780; font-size: 13px; }
+.date-cell { color: var(--text-muted, #94a3b8); font-size: 0.8rem; }
 
 /* ── Botón eliminar ── */
 .btn-delete {
   height: 30px;
   padding: 0 12px;
-  border: 0.5px solid rgba(226,75,74,0.4);
-  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 0.375rem;
   background: transparent;
-  font-family: 'Syne', sans-serif;
-  font-size: 12px;
-  color: #a32d2d;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fca5a5;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: all 0.15s ease;
 }
 
-.btn-delete:hover          { background: #fcebeb; }
-.btn-delete.confirming     { background: #e24b4a; color: #fff; border-color: #e24b4a; }
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete.confirming {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
 
 /* ── Estados ── */
 .state-msg {
-  color: #888780;
-  font-size: 14px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.875rem;
   margin-top: 2rem;
+  text-align: center;
 }
 
 .empty-row {
   text-align: center;
-  color: #b4b2a9;
-  font-size: 13px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.8rem;
   padding: 2rem !important;
 }
 
 .error-box {
-  background: #fcebeb;
-  border: 0.5px solid rgba(226,75,74,0.3);
-  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 0.75rem;
   padding: 1.25rem 1.5rem;
   margin-top: 1rem;
 }
 
-.error-box strong { color: #a32d2d; font-size: 14px; }
-.error-box p      { color: #791f1f; font-size: 13px; margin-top: 4px; }
-.error-box .error-hint { margin-top: 8px; color: #888780; }
-.error-box code   { background: rgba(0,0,0,0.07); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+.error-box strong { color: #fca5a5; font-size: 0.875rem; }
+.error-box p      { color: #f87171; font-size: 0.8rem; margin-top: 4px; }
+.error-box .error-hint { margin-top: 8px; color: var(--text-muted, #94a3b8); }
+.error-box code   { background: rgba(255, 255, 255, 0.08); padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; }
