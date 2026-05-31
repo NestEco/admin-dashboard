@@ -1,8 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import Usuarios from "./pages/Usuarios";
-import Comics   from "./pages/Comics";
-import Ventas   from "./pages/Ventas";
+import Comics from "./pages/Comics";
 
 const TABS = [
   { id: "inicio",   label: "Inicio",   icon: "⌂" },
@@ -23,13 +22,18 @@ function renderPage(id) {
   switch (id) {
     case "usuarios": return <Usuarios />;
     case "comics":   return <Comics />;
-    case "ventas":   return <Ventas />;
     default:         return <Placeholder label={TABS.find(t => t.id === id)?.label} />;
   }
 }
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("inicio");
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'http://localhost:5173';
+  };
 
   return (
     <div className="admin-shell">
@@ -38,6 +42,13 @@ export default function App() {
           <div className="brand-dot" />
           AdminPanel
         </div>
+        <button 
+          onClick={handleLogout}
+          className="logout-button"
+          title="Cerrar sesión"
+        >
+          Cerrar Sesión
+        </button>
         <nav className="nav-tabs">
           {TABS.map((tab) => (
             <button

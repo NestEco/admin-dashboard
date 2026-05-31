@@ -1,312 +1,301 @@
-// src/pages/Comics.jsx
-import { useEffect, useState } from "react";
-import { comicsApi } from "../services/comicsApi";
-import "./Comics.css";
+import { useState, useEffect } from 'react'
 
-// ── Helpers ───────────────────────────────────────────────
-
-function formatPrecio(precio) {
-  if (precio == null) return "—";
-  return new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    maximumFractionDigits: 0,
-  }).format(precio);
-}
-
-function StockBadge({ stock }) {
-  const cls =
-    stock === 0 ? "stock-empty" : stock <= 5 ? "stock-low" : "stock-ok";
-  const label =
-    stock === 0 ? "Sin stock" : stock <= 5 ? `${stock} restantes` : stock;
-  return <span className={`stock-badge ${cls}`}>{label}</span>;
-}
-
-function StatusBadge({ status }) {
-  return (
-    <span className={`status-badge status-${status}`}>
-      {status === "UP" ? "Conectado" : "Sin conexión"}
-    </span>
-  );
-}
-
-// ── Fila de tabla ─────────────────────────────────────────
-
-function ComicRow({ comic, onDelete }) {
-  const [confirmando, setConfirmando] = useState(false);
-
-  const handleDelete = async () => {
-    if (!confirmando) { setConfirmando(true); return; }
-    try {
-      await onDelete(comic.id);
-    } catch {
-      setConfirmando(false);
-    }
-  };
-
-  return (
-    <tr>
-      <td>
-        <p className="comic-titulo">{comic.titulo}</p>
-        <p className="comic-id">#{comic.id}</p>
-      </td>
-      <td>{comic.autor ?? "—"}</td>
-      <td>
-        <span className="editorial-badge">{comic.editorial ?? "—"}</span>
-      </td>
-      <td className="precio-cell">{formatPrecio(comic.precio)}</td>
-      <td><StockBadge stock={comic.stock ?? 0} /></td>
-      <td>
-        <button
-          className={`btn-delete${confirmando ? " confirming" : ""}`}
-          onClick={handleDelete}
-          onBlur={() => setConfirmando(false)}
-        >
-          {confirmando ? "¿Confirmar?" : "Eliminar"}
-        </button>
-      </td>
-    </tr>
-  );
-}
-
-// ── Panel de filtros ──────────────────────────────────────
-
-function Filtros({ filtros, onChange, onReset, editoriales, autores }) {
-  return (
-    <div className="filtros-panel">
-      <div className="filtros-row">
-
-        <div className="filtro-group">
-          <label className="filtro-label">Búsqueda</label>
-          <input
-            className="filtro-input"
-            type="text"
-            placeholder="Título, autor, editorial..."
-            value={filtros.busqueda}
-            onChange={(e) => onChange("busqueda", e.target.value)}
-          />
-        </div>
-
-        <div className="filtro-group">
-          <label className="filtro-label">Autor</label>
-          <select
-            className="filtro-input"
-            value={filtros.autor}
-            onChange={(e) => onChange("autor", e.target.value)}
-          >
-            <option value="">Todos</option>
-            {autores.map((a) => <option key={a} value={a}>{a}</option>)}
-          </select>
-        </div>
-
-        <div className="filtro-group">
-          <label className="filtro-label">Editorial</label>
-          <select
-            className="filtro-input"
-            value={filtros.editorial}
-            onChange={(e) => onChange("editorial", e.target.value)}
-          >
-            <option value="">Todas</option>
-            {editoriales.map((e) => <option key={e} value={e}>{e}</option>)}
-          </select>
-        </div>
-
-        <div className="filtro-group filtro-group--range">
-          <label className="filtro-label">Precio (CLP)</label>
-          <div className="range-inputs">
-            <input
-              className="filtro-input filtro-input--sm"
-              type="number"
-              placeholder="Mín"
-              min={0}
-              value={filtros.precioMin}
-              onChange={(e) => onChange("precioMin", e.target.value)}
-            />
-            <span className="range-sep">—</span>
-            <input
-              className="filtro-input filtro-input--sm"
-              type="number"
-              placeholder="Máx"
-              min={0}
-              value={filtros.precioMax}
-              onChange={(e) => onChange("precioMax", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="filtro-group">
-          <label className="filtro-label">Stock</label>
-          <select
-            className="filtro-input"
-            value={filtros.stock}
-            onChange={(e) => onChange("stock", e.target.value)}
-          >
-            <option value="">Todos</option>
-            <option value="disponible">Con stock</option>
-            <option value="bajo">Stock bajo (≤5)</option>
-            <option value="vacio">Sin stock</option>
-          </select>
-        </div>
-
-      </div>
-
-      <button className="btn-reset" onClick={onReset}>
-        ✕ Limpiar filtros
-      </button>
-    </div>
-  );
-}
-
-// ── Filtros iniciales ─────────────────────────────────────
-
-const FILTROS_INIT = {
-  busqueda:  "",
-  autor:     "",
-  editorial: "",
-  precioMin: "",
-  precioMax: "",
-  stock:     "",
-};
-
-// ── Componente principal ──────────────────────────────────
-
-export default function Comics() {
-  const [comics, setComics]       = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState(null);
-  const [apiStatus, setApiStatus] = useState(null);
-  const [filtros, setFiltros]     = useState(FILTROS_INIT);
+const Comics = () => {
+  const [comics, setComics] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingComic, setEditingComic] = useState(null)
+  const [formData, setFormData] = useState({
+    titulo: '',
+    autor: '',
+    editorial: '',
+    precio: '',
+    stock: '',
+    imagenUrl: ''
+  })
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
 
   useEffect(() => {
-    comicsApi.healthCheck()
-      .then((d) => setApiStatus(d.status))
-      .catch(() => setApiStatus("DOWN"));
-  }, []);
+    fetchComics()
+  }, [])
 
-  const cargarComics = async () => {
-    setLoading(true);
-    setError(null);
+  const fetchComics = async () => {
     try {
-      const data = await comicsApi.obtenerTodos();
-      setComics(data);
+      const response = await fetch('http://localhost:8081/api/comics')
+      if (response.ok) {
+        const data = await response.json()
+        setComics(data)
+      }
     } catch (err) {
-      setError(err.message);
+      setError('Error al cargar los comics')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  useEffect(() => { cargarComics(); }, []);
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
 
-  const handleEliminar = async (id) => {
-    await comicsApi.eliminar(id);
-    setComics((prev) => prev.filter((c) => c.id !== id));
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
 
-  const handleFiltro = (key, value) =>
-    setFiltros((prev) => ({ ...prev, [key]: value }));
+    try {
+      const comicData = {
+        ...formData,
+        precio: parseFloat(formData.precio),
+        stock: parseInt(formData.stock)
+      }
 
-  const handleReset = () => setFiltros(FILTROS_INIT);
+      const url = editingComic 
+        ? `http://localhost:8081/api/comics/${editingComic.id}`
+        : 'http://localhost:8081/api/comics'
+      
+      const method = editingComic ? 'PUT' : 'POST'
 
-  // Opciones únicas para los selects
-  const editoriales = [...new Set(comics.map((c) => c.editorial).filter(Boolean))].sort();
-  const autores     = [...new Set(comics.map((c) => c.autor).filter(Boolean))].sort();
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(comicData)
+      })
 
-  // Aplicar filtros
-  const comicsFiltrados = comics.filter((c) => {
-    const texto = filtros.busqueda.toLowerCase();
-    if (texto && !(
-      c.titulo?.toLowerCase().includes(texto) ||
-      c.autor?.toLowerCase().includes(texto) ||
-      c.editorial?.toLowerCase().includes(texto)
-    )) return false;
+      if (response.ok) {
+        setSuccess(editingComic ? 'Comic actualizado correctamente' : 'Comic creado correctamente')
+        fetchComics()
+        resetForm()
+      } else {
+        throw new Error('Error al guardar el comic')
+      }
+    } catch (err) {
+      setError(err.message)
+    }
+  }
 
-    if (filtros.autor     && c.autor     !== filtros.autor)     return false;
-    if (filtros.editorial && c.editorial !== filtros.editorial) return false;
+  const handleEdit = (comic) => {
+    setEditingComic(comic)
+    setFormData({
+      titulo: comic.titulo,
+      autor: comic.autor,
+      editorial: comic.editorial,
+      precio: comic.precio.toString(),
+      stock: comic.stock.toString(),
+      imagenUrl: comic.imagenUrl || ''
+    })
+    setShowForm(true)
+  }
 
-    if (filtros.precioMin && c.precio < Number(filtros.precioMin)) return false;
-    if (filtros.precioMax && c.precio > Number(filtros.precioMax)) return false;
+  const handleDelete = async (id) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este comic?')) {
+      return
+    }
 
-    if (filtros.stock === "disponible" && c.stock <= 0)  return false;
-    if (filtros.stock === "bajo"       && (c.stock <= 0 || c.stock > 5)) return false;
-    if (filtros.stock === "vacio"      && c.stock !== 0) return false;
+    try {
+      const response = await fetch(`http://localhost:8081/api/comics/${id}`, {
+        method: 'DELETE'
+      })
 
-    return true;
-  });
+      if (response.ok) {
+        setSuccess('Comic eliminado correctamente')
+        fetchComics()
+      } else {
+        throw new Error('Error al eliminar el comic')
+      }
+    } catch (err) {
+      setError(err.message)
+    }
+  }
 
-  const hayFiltros = Object.values(filtros).some((v) => v !== "");
+  const resetForm = () => {
+    setFormData({
+      titulo: '',
+      autor: '',
+      editorial: '',
+      precio: '',
+      stock: '',
+      imagenUrl: ''
+    })
+    setEditingComic(null)
+    setShowForm(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="comics-container">
+        <div className="loading">Cargando comics...</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="comics-page">
-
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Cómics</h1>
-          <p className="page-subtitle">
-            {hayFiltros
-              ? `${comicsFiltrados.length} de ${comics.length} cómics`
-              : `${comics.length} cómic${comics.length !== 1 ? "s" : ""} en catálogo`}
-          </p>
-        </div>
-        <div className="header-actions">
-          <StatusBadge status={apiStatus ?? "—"} />
-          <button className="btn-refresh" onClick={cargarComics}>↻ Actualizar</button>
-        </div>
+    <div className="comics-container">
+      <div className="comics-header">
+        <h2>Gestión de Comics</h2>
+        <button 
+          onClick={() => setShowForm(true)}
+          className="btn-primary"
+        >
+          + Nuevo Comic
+        </button>
       </div>
 
-      {/* Filtros */}
-      <Filtros
-        filtros={filtros}
-        onChange={handleFiltro}
-        onReset={handleReset}
-        editoriales={editoriales}
-        autores={autores}
-      />
-
-      {/* Estados */}
-      {loading && <p className="state-msg">Cargando cómics...</p>}
       {error && (
-        <div className="error-box">
-          <strong>Error al conectar con el microservicio</strong>
-          <p>{error}</p>
-          <p className="error-hint">
-            Asegúrate de que el servicio esté corriendo en{" "}
-            <code>{import.meta.env.VITE_COMICS_API_URL}</code>
-          </p>
+        <div className="error-message">
+          {error}
         </div>
       )}
 
-      {/* Tabla */}
-      {!loading && !error && (
-        <div className="table-wrapper">
-          <table className="comics-table">
-            <thead>
-              <tr>
-                <th>Título</th>
-                <th>Autor</th>
-                <th>Editorial</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comicsFiltrados.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="empty-row">
-                    No se encontraron cómics con esos filtros
-                  </td>
-                </tr>
-              ) : (
-                comicsFiltrados.map((c) => (
-                  <ComicRow key={c.id} comic={c} onDelete={handleEliminar} />
-                ))
-              )}
-            </tbody>
-          </table>
+      {success && (
+        <div className="success-message">
+          {success}
+        </div>
+      )}
+
+      {showForm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>{editingComic ? 'Editar Comic' : 'Nuevo Comic'}</h3>
+              <button onClick={resetForm} className="close-btn">×</button>
+            </div>
+            <form onSubmit={handleSubmit} className="comic-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Título</label>
+                  <input
+                    type="text"
+                    name="titulo"
+                    value={formData.titulo}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Autor</label>
+                  <input
+                    type="text"
+                    name="autor"
+                    value={formData.autor}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Editorial</label>
+                  <input
+                    type="text"
+                    name="editorial"
+                    value={formData.editorial}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Precio</label>
+                  <input
+                    type="number"
+                    name="precio"
+                    value={formData.precio}
+                    onChange={handleInputChange}
+                    step="0.01"
+                    min="0"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stock</label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={formData.stock}
+                    onChange={handleInputChange}
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>URL Imagen (opcional)</label>
+                  <input
+                    type="text"
+                    name="imagenUrl"
+                    value={formData.imagenUrl}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="form-actions">
+                <button type="button" onClick={resetForm} className="btn-secondary">
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-primary">
+                  {editingComic ? 'Actualizar' : 'Crear'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div className="comics-grid">
+        {comics.map((comic) => (
+          <div key={comic.id} className="comic-card">
+            {comic.imagenUrl && (
+              <img 
+                src={comic.imagenUrl} 
+                alt={comic.titulo}
+                className="comic-image"
+                onError={(e) => e.target.style.display = 'none'}
+              />
+            )}
+            <div className="comic-info">
+              <h3>{comic.titulo}</h3>
+              <p><strong>Autor:</strong> {comic.autor}</p>
+              <p><strong>Editorial:</strong> {comic.editorial}</p>
+              <p><strong>Precio:</strong> ${comic.precio}</p>
+              <p><strong>Stock:</strong> {comic.stock}</p>
+            </div>
+            <div className="comic-actions">
+              <button 
+                onClick={() => handleEdit(comic)}
+                className="btn-edit"
+              >
+                Editar
+              </button>
+              <button 
+                onClick={() => handleDelete(comic.id)}
+                className="btn-delete"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {comics.length === 0 && (
+        <div className="no-comics">
+          <p>No hay comics registrados</p>
+          <button 
+            onClick={() => setShowForm(true)}
+            className="btn-primary"
+          >
+            Crear primer comic
+          </button>
         </div>
       )}
     </div>
-  );
+  )
 }
+
+export default Comics

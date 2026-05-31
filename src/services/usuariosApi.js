@@ -26,4 +26,3 @@ export const usuariosApi = {
   eliminar:       (id)           => request(`/${id}`,    { method: "DELETE" }),
   healthCheck:    ()             => request("/health"),
 };
-
