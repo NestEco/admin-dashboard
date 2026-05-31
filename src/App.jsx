@@ -1,7 +1,9 @@
 import { useState } from "react";
 import "./App.css";
+import Inicio   from "./pages/Inicio";
 import Usuarios from "./pages/Usuarios";
-import Comics from "./pages/Comics";
+import Comics   from "./pages/Comics";
+import Ventas   from "./pages/Ventas";
 
 const TABS = [
   { id: "inicio",   label: "Inicio",   icon: "⌂" },
@@ -10,19 +12,13 @@ const TABS = [
   { id: "ventas",   label: "Ventas",   icon: "◇" },
 ];
 
-function Placeholder({ label }) {
-  return (
-    <div className="placeholder">
-      <span>— sección: {label} —</span>
-    </div>
-  );
-}
-
 function renderPage(id) {
   switch (id) {
+    case "inicio":   return <Inicio />;
     case "usuarios": return <Usuarios />;
     case "comics":   return <Comics />;
-    default:         return <Placeholder label={TABS.find(t => t.id === id)?.label} />;
+    case "ventas":   return <Ventas />;
+    default:         return <Inicio />;
   }
 }
 
@@ -42,7 +38,7 @@ export default function App() {
           <div className="brand-dot" />
           AdminPanel
         </div>
-        <button 
+        <button
           onClick={handleLogout}
           className="logout-button"
           title="Cerrar sesión"
