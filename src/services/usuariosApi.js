@@ -2,8 +2,13 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 async function request(path, options = {}) {
+  const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...options,
   });
 
@@ -17,12 +22,13 @@ async function request(path, options = {}) {
 }
 
 export const usuariosApi = {
-  obtenerTodos:   ()             => request("/"),
+  obtenerTodos:   ()             => request(""),
   obtenerPorId:   (id)           => request(`/${id}`),
   obtenerPorEmail:(email)        => request(`/email/${email}`),
   registrar:      (usuario)      => request("/registro", { method: "POST", body: JSON.stringify(usuario) }),
   login:          (email, pass)  => request("/login",    { method: "POST", body: JSON.stringify({ email, password: pass }) }),
   actualizar:     (id, usuario)  => request(`/${id}`,    { method: "PUT",  body: JSON.stringify(usuario) }),
+  actualizarRol:  (id, rol)      => request(`/${id}/rol`, { method: "PUT",  body: JSON.stringify({ rol }) }),
   eliminar:       (id)           => request(`/${id}`,    { method: "DELETE" }),
   healthCheck:    ()             => request("/health"),
 };

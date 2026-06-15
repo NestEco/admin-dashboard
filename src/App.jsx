@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import Inicio   from "./pages/Inicio";
 import Usuarios from "./pages/Usuarios";
@@ -24,12 +24,60 @@ function renderPage(id) {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("inicio");
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    // 1. Ingest URL query parameters (SSO from login portal)
+    const params = new URLSearchParams(window.location.search);
+    const tokenParam = params.get("token");
+    const userParam = params.get("user");
+
+    if (tokenParam && userParam) {
+      localStorage.setItem("token", tokenParam);
+      localStorage.setItem("user", decodeURIComponent(userParam));
+      // Clear URL params
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+
+    // 2. Validate token and Admin role session
+    const token = localStorage.getItem("token");
+    const userStr = localStorage.getItem("user");
+
+    if (!token || !userStr) {
+      // Redirect to login portal
+      window.location.href = "http://localhost:5173";
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userStr);
+      if (user.rol?.toLowerCase() !== "admin") {
+        alert("Acceso denegado: Se requiere rol de Administrador.");
+        window.location.href = "http://localhost:5173";
+        return;
+      }
+      setAuthorized(true);
+    } catch (e) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "http://localhost:5173";
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = 'http://localhost:5173';
   };
+
+  if (!authorized) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#0f172a', color: '#fff' }}>
+        <p>Verificando credenciales de Administrador...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-shell">

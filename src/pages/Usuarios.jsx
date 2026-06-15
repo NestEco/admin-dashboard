@@ -34,8 +34,9 @@ function StatusBadge({ status }) {
   );
 }
 
-function UserRow({ user, onDelete }) {
+function UserRow({ user, onDelete, onRoleChange }) {
   const [confirmando, setConfirmando] = useState(false);
+  const [updatingRol, setUpdatingRol] = useState(false);
 
   const handleDelete = async () => {
     if (!confirmando) {
@@ -46,6 +47,18 @@ function UserRow({ user, onDelete }) {
       await onDelete(user.id);
     } catch {
       setConfirmando(false);
+    }
+  };
+
+  const handleSelectChange = async (e) => {
+    const nuevoRol = e.target.value;
+    setUpdatingRol(true);
+    try {
+      await onRoleChange(user.id, nuevoRol);
+    } catch {
+      // El error ya es reportado con un alert en el componente padre
+    } finally {
+      setUpdatingRol(false);
     }
   };
 
@@ -61,9 +74,18 @@ function UserRow({ user, onDelete }) {
         </div>
       </td>
       <td>
-        <span className={`rol-badge rol-${user.rol?.toLowerCase()}`}>
-          {user.rol ?? "Cliente"}
-        </span>
+        <div className="rol-select-wrapper">
+          <select
+            value={user.rol || "CLIENTE"}
+            onChange={handleSelectChange}
+            disabled={updatingRol}
+            className={`rol-select rol-${user.rol?.toLowerCase()}`}
+          >
+            <option value="CLIENTE">Cliente</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+          {updatingRol && <span className="rol-loader">...</span>}
+        </div>
       </td>
       <td className="date-cell">{formatDate(user.fechaRegistro)}</td>
       <td>
@@ -117,6 +139,18 @@ export default function Usuarios() {
   const handleEliminar = async (id) => {
     await usuariosApi.eliminar(id);
     setUsuarios((prev) => prev.filter((u) => u.id !== id));
+  };
+
+  const handleRoleChange = async (id, nuevoRol) => {
+    try {
+      await usuariosApi.actualizarRol(id, nuevoRol);
+      setUsuarios((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, rol: nuevoRol } : u))
+      );
+    } catch (err) {
+      alert("Error al cambiar el rol: " + err.message);
+      throw err;
+    }
   };
 
   // Filtro de búsqueda local
@@ -190,7 +224,12 @@ export default function Usuarios() {
                 </tr>
               ) : (
                 usuariosFiltrados.map((u) => (
-                  <UserRow key={u.id} user={u} onDelete={handleEliminar} />
+                  <UserRow
+                    key={u.id}
+                    user={u}
+                    onDelete={handleEliminar}
+                    onRoleChange={handleRoleChange}
+                  />
                 ))
               )}
             </tbody>

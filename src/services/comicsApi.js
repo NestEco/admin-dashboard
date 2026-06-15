@@ -2,8 +2,13 @@
 const BASE_URL = import.meta.env.VITE_COMICS_API_URL;
 
 async function request(path, options = {}) {
+  const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...options,
   });
 
@@ -17,9 +22,9 @@ async function request(path, options = {}) {
 }
 
 export const comicsApi = {
-  obtenerTodos:  ()           => request("/"),
+  obtenerTodos:  ()           => request(""),
   obtenerPorId:  (id)         => request(`/${id}`),
-  crear:         (comic)      => request("/",     { method: "POST",   body: JSON.stringify(comic) }),
+  crear:         (comic)      => request("",     { method: "POST",   body: JSON.stringify(comic) }),
   actualizar:    (id, comic)  => request(`/${id}`, { method: "PUT",   body: JSON.stringify(comic) }),
   eliminar:      (id)         => request(`/${id}`, { method: "DELETE" }),
   healthCheck:   ()           => request("/health"),

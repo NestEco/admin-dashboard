@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { comicsApi } from '../services/comicsApi'
 
 const Comics = () => {
   const [comics, setComics] = useState([])
@@ -22,11 +23,22 @@ const Comics = () => {
 
   const fetchComics = async () => {
     try {
-      const response = await fetch('http://localhost:8081/api/comics')
-      if (response.ok) {
-        const data = await response.json()
-        setComics(data)
-      }
+      const data = await comicsApi.obtenerTodos()
+      const mappedData = data.map(comic => ({
+        id: comic.id,
+        titulo: comic.title,
+        autor: comic.author,
+        editorial: comic.publisher,
+        precio: comic.price,
+        stock: comic.stock,
+        imagenUrl: comic.coverImage,
+        description: comic.description,
+        releaseDate: comic.releaseDate,
+        genre: comic.genre,
+        pages: comic.pages,
+        language: comic.language
+      }))
+      setComics(mappedData)
     } catch (err) {
       setError('Error al cargar los comics')
     } finally {
@@ -48,32 +60,32 @@ const Comics = () => {
 
     try {
       const comicData = {
-        ...formData,
-        precio: parseFloat(formData.precio),
-        stock: parseInt(formData.stock)
+        title: formData.titulo,
+        author: formData.autor,
+        publisher: formData.editorial,
+        price: parseFloat(formData.precio),
+        stock: parseInt(formData.stock),
+        coverImage: formData.imagenUrl
       }
 
-      const url = editingComic 
-        ? `http://localhost:8081/api/comics/${editingComic.id}`
-        : 'http://localhost:8081/api/comics'
-      
-      const method = editingComic ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(comicData)
-      })
-
-      if (response.ok) {
-        setSuccess(editingComic ? 'Comic actualizado correctamente' : 'Comic creado correctamente')
-        fetchComics()
-        resetForm()
+      if (editingComic) {
+        const updatedComicData = {
+          id: editingComic.id,
+          description: editingComic.description,
+          releaseDate: editingComic.releaseDate,
+          genre: editingComic.genre,
+          pages: editingComic.pages,
+          language: editingComic.language,
+          ...comicData
+        }
+        await comicsApi.actualizar(editingComic.id, updatedComicData)
+        setSuccess('Comic actualizado correctamente')
       } else {
-        throw new Error('Error al guardar el comic')
+        await comicsApi.crear(comicData)
+        setSuccess('Comic creado correctamente')
       }
+      fetchComics()
+      resetForm()
     } catch (err) {
       setError(err.message)
     }
@@ -98,16 +110,9 @@ const Comics = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8081/api/comics/${id}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        setSuccess('Comic eliminado correctamente')
-        fetchComics()
-      } else {
-        throw new Error('Error al eliminar el comic')
-      }
+      await comicsApi.eliminar(id)
+      setSuccess('Comic eliminado correctamente')
+      fetchComics()
     } catch (err) {
       setError(err.message)
     }

@@ -160,7 +160,7 @@ function comicsRanking(ventas, comics) {
       const comic = comics.find(
         (c) => String(c.id) === String(id)
       );
-      return { id, total, titulo: comic?.titulo ?? `Comic #${id}`, precio: comic?.precio };
+      return { id, total, titulo: comic?.title ?? comic?.titulo ?? `Comic #${id}`, precio: comic?.price ?? comic?.precio };
     });
 }
 
